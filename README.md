@@ -5,6 +5,7 @@ Simple neovim selecta bindings for searching through files and buffers
 ## Usage
 
 Search through files with: `,f`
+
 Search through open buffers with: `,b`
 
 To configure the file-search tool, add this to your `.vimrc`:
