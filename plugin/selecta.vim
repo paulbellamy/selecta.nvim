@@ -1,12 +1,14 @@
 if exists('g:selecta_loaded')
-    finish
+  finish
 endif
 
 " Set a special flag used only by this plugin for preventing doubly
 " loading the script.
 let g:selecta_loaded = 1
 
-let g:selecta_files_tool = "ag --hidden -l"
+if !exists('g:selecta_files_tool')
+  let g:selecta_files_tool = "ag --hidden -l"
+endif
 
 function! SelectaCommand(choice_command, selecta_args, vim_command)
   let job = { 'buf': bufnr('%'), 'vim_command': a:vim_command, 'temps': { 'result': tempname() }, 'name': 'SelectaCommand' }
