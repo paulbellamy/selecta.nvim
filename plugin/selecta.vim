@@ -10,11 +10,35 @@ if !exists('g:selecta_files_tool')
   let g:selecta_files_tool = "ag --hidden -l"
 endif
 
+function! s:activate_autocmds(bufnr, job_id)
+  augroup SelectaAutoHide
+    autocmd!
+    " Commented, because this autoevent doesn't exist in neovim yet: https://github.com/neovim/neovim/issues/8428
+    " exec 'autocmd TermLeave <buffer='.a:bufnr.'> nested call jobstop('.a:job_id.')'
+    exec 'autocmd BufLeave <buffer='.a:bufnr.'> nested call jobstop('.a:job_id.')'
+  augroup END
+endfunction
+
+
+function! s:deactivate_autocmds()
+  augroup SelectaAutoHide
+    autocmd!
+  augroup END
+endfunction
+
 function! selecta#command(choice_command, selecta_args, vim_command)
-  let job = { 'buf': bufnr('%'), 'vim_command': a:vim_command, 'temps': { 'result': tempname() }, 'name': 'selecta#command' }
+  exec 'botright' '21new'
+
+  let job = {
+  \ 'buf': bufnr('%'),
+  \ 'name': 'selecta#command',
+  \ 'temps': { 'result': tempname() },
+  \ 'vim_command': a:vim_command
+  \ }
 
   function! job.on_exit(id, code, event)
-    bd!
+    call s:deactivate_autocmds()
+    exec 'bd!'.self.buf
 
     if a:code != 0
       return 1
@@ -29,10 +53,11 @@ function! selecta#command(choice_command, selecta_args, vim_command)
     endif
   endfunction
 
-  exec 'botright' '21new'
-  call termopen(a:choice_command." | selecta ".a:selecta_args." > ".job.temps.result, job)
-
+  let job_id = termopen(a:choice_command." | selecta ".a:selecta_args." > ".job.temps.result, job)
   setf job
+
+  call s:activate_autocmds(job.buf, job_id)
+
   startinsert
 endfunction
 
