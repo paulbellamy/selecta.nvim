@@ -9,8 +9,9 @@ Search through files with: `,f`
 Search through open buffers with: `,b`
 
 To configure the file-search tool, add this to your `.vimrc`:
+
 ```
-set g:selecta_files_tool = "ag --hidden -l"
+let g:selecta_files_tool = "ag --hidden -l"
 ```
 
 ## Installation

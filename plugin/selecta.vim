@@ -10,8 +10,8 @@ if !exists('g:selecta_files_tool')
   let g:selecta_files_tool = "ag --hidden -l"
 endif
 
-function! SelectaCommand(choice_command, selecta_args, vim_command)
-  let job = { 'buf': bufnr('%'), 'vim_command': a:vim_command, 'temps': { 'result': tempname() }, 'name': 'SelectaCommand' }
+function! selecta#command(choice_command, selecta_args, vim_command)
+  let job = { 'buf': bufnr('%'), 'vim_command': a:vim_command, 'temps': { 'result': tempname() }, 'name': 'selecta#command' }
 
   function! job.on_exit(id, code, event)
     bd!
@@ -36,18 +36,14 @@ function! SelectaCommand(choice_command, selecta_args, vim_command)
   startinsert
 endfunction
 
-function! SelectaBuffer()
+function! selecta#buffer()
   let bufnrs = filter(range(1, bufnr("$")), 'buflisted(v:val)')
   let buffers = map(bufnrs, 'bufname(v:val)')
-  call SelectaCommand('echo "' . join(buffers, "\n") . '"', "", ":b")
+  call selecta#command('echo "' . join(buffers, "\n") . '"', "", ":b")
 endfunction
 
-" Find all files in all non-dot directories starting in the working directory.
-" Fuzzy select one of those. Open the selected file with :e.
-nnoremap <expr> <Plug>(selecta-file) :call SelectaCommand(g:selecta_files_tool, "", ":e")<cr>
-
-" Fuzzy select a buffer
-nnoremap <expr> <Plug>(selecta-buffer) :call SelectaBuffer()<cr>
+nnoremap <Plug>(selecta-file)   :<C-U>call selecta#command(g:selecta_files_tool, "", ":e")<CR>
+nnoremap <Plug>(selecta-buffer) :<C-U>call selecta#buffer()<CR>
 
 " Default hotkeys
 nmap <leader>f <Plug>(selecta-file)
