@@ -27,10 +27,12 @@ function! s:deactivate_autocmds()
 endfunction
 
 function! selecta#command(choice_command, selecta_args, vim_command)
+  let l:winnr = winnr()
   exec 'botright' '21new'
 
   let job = {
   \ 'buf': bufnr('%'),
+	\ 'win': l:winnr,
   \ 'name': 'selecta#command',
   \ 'temps': { 'result': tempname() },
   \ 'vim_command': a:vim_command
@@ -39,6 +41,8 @@ function! selecta#command(choice_command, selecta_args, vim_command)
   function! job.on_exit(id, code, event)
     call s:deactivate_autocmds()
     exec 'bd!'.self.buf
+
+		exec self.win.' wincmd w'
 
     if a:code != 0
       return 1
